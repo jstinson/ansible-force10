@@ -1,7 +1,7 @@
 ## Setup
 
     ## install ansible
-    Install Xcode (should already be installed if you are running chef)
+    Install Xcode
     sudo easy_install pip
     sudo pip install ansible --quiet
 
