@@ -1,0 +1,11 @@
+interface TenGigabitEthernet 0/XXXX
+ ip address 172.17.50.41/30
+ no shutdown
+!
+router bgp 65000
+ neighbor 172.17.50.42 remote-as 65011
+ neighbor 172.17.50.42 description sw-01
+ neighbor 172.17.50.42 fall-over
+ neighbor 172.17.50.42 default-originate
+ neighbor 172.17.50.42 soft-reconfiguration inbound
+ neighbor 172.17.50.42 no shutdown

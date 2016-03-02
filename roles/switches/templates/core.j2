@@ -1,0 +1,11 @@
+interface TenGigabitEthernet 0/XXXX
+ ip address {{item.uplink_neighbor}}/30
+ no shutdown
+!
+router bgp 65000
+ neighbor {{item.uplink_ip}} remote-as {{item.asn}}
+ neighbor {{item.uplink_ip}} description {{item.hostname}}
+ neighbor {{item.uplink_ip}} fall-over
+ neighbor {{item.uplink_ip}} default-originate
+ neighbor {{item.uplink_ip}} soft-reconfiguration inbound
+ neighbor {{item.uplink_ip}} no shutdown

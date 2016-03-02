@@ -1,0 +1,8 @@
+---
+- name: Generate Switch Config - main.yml
+  template: src={{item.switch_type}}.j2 dest=./{{item.hostname}}
+  with_items: switches
+
+- name: Generate Core Switch Snippet - main.yml
+  template: src=core.j2 dest=./{{item.hostname}}.core
+  with_items: switches

@@ -1,0 +1,4 @@
+---
+switches:
+      - {switch_type: s4810, hostname: sw-01, uplink_ip: 172.17.50.162, uplink_neighbor: 172.17.50.161, mgmt_ip: 10.10.15.24, cabinet: 15, asn: 65015}
+      - {switch_type: s60, hostname: sw-01, uplink_ip: 172.17.50.42, uplink_neighbor: 172.17.50.41, mgmt_ip: 10.10.11.24, cabinet: 11, asn: 65011}

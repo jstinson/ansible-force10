@@ -1,0 +1,186 @@
+boot system stack-unit 0 primary system: A:
+boot system stack-unit 0 secondary system: A:
+boot system stack-unit 0 default system: B:
+boot system gateway 192.168.128.1
+!
+redundancy auto-synchronize full
+!
+hardware watchdog
+!
+service timestamps log datetime localtime msec show-timezone
+!
+hostname {{item.hostname}}
+!
+aaa authentication login radius local radius
+aaa authorization exec radius local radius
+!
+username someuser password 7 someencrypedpassword privilege 15
+!
+stack-unit 0 provision S60
+!
+{% for number in range (0,48) %}
+!
+interface GigabitEthernet 0/{{number}}
+ no ip address
+ switchport
+ flowcontrol rx on
+ no shutdown
+{% endfor %}
+!
+interface TenGigabitEthernet 0/48
+ no ip address
+ switchport
+ flowcontrol rx on
+ no shutdown
+!
+interface TenGigabitEthernet 0/49
+ ip address {{item.uplink_ip}}/30
+ flowcontrol rx on
+ no shutdown
+!
+interface ManagementEthernet 0/0
+ ip address {{item.mgmt_ip}}/16
+ no shutdown
+!
+interface ManagementEthernet 1/0
+ no shutdown
+!
+interface ManagementEthernet 2/0
+ no shutdown
+!
+interface ManagementEthernet 3/0
+ no shutdown
+!
+interface ManagementEthernet 4/0
+ no shutdown
+!
+interface ManagementEthernet 5/0
+ no shutdown
+!
+interface ManagementEthernet 6/0
+ no shutdown
+!
+interface ManagementEthernet 7/0
+ no shutdown
+!
+interface ManagementEthernet 8/0
+ no shutdown
+!
+interface ManagementEthernet 9/0
+ no shutdown
+!
+interface ManagementEthernet 10/0
+ no shutdown
+!
+interface ManagementEthernet 11/0
+ no shutdown
+!
+interface Vlan 1
+!
+interface Vlan {{item.cabinet}}
+ {% if '01' in item.hostname %}
+ ip address 10.10.{{item.cabinet}}.253/24
+ {% else %}
+ ip address 10.10.{{item.cabinet}}.254/24
+ {% endif %}
+ tagged TenGigabitEthernet 0/48
+ untagged GigabitEthernet 0/0-47
+!
+ vrrp-group 12
+  virtual-address 10.10.{{item.cabinet}}.1
+ ip helper-address 10.10.20.11
+ no shutdown
+!
+router bgp {{item.asn}}
+ network 10.10.{{item.cabinet}}.0/24
+ timers bgp 1 3
+ maximum-paths ebgp 4
+ {% if '01' in item.hostname %}
+ neighbor 10.10.{{item.cabinet}}.254 remote-as {{item.asn}}
+ neighbor 10.10.{{item.cabinet}}.254 description "peer switch"
+ neighbor 10.10.{{item.cabinet}}.254 fall-over
+ neighbor 10.10.{{item.cabinet}}.254 next-hop-self
+ neighbor 10.10.{{item.cabinet}}.254 soft-reconfiguration inbound
+ neighbor 10.10.{{item.cabinet}}.254 no shutdown
+ {% else %}
+ neighbor 10.10.{{item.cabinet}}.253 remote-as {{item.asn}}
+ neighbor 10.10.{{item.cabinet}}.253 description "peer switch"
+ neighbor 10.10.{{item.cabinet}}.253 fall-over
+ neighbor 10.10.{{item.cabinet}}.253 next-hop-self
+ neighbor 10.10.{{item.cabinet}}.253 soft-reconfiguration inbound
+ neighbor 10.10.{{item.cabinet}}.253 no shutdown
+ {% endif %}
+ neighbor {{item.uplink_neighbor}} remote-as 65000
+ {% if '01' in item.hostname %}
+ neighbor {{item.uplink_neighbor}} description BGP-Core03
+ {% else %}
+ neighbor {{item.uplink_neighbor}} description BGP-Core04
+ {% endif %}
+ neighbor {{item.uplink_neighbor}} fall-over
+ neighbor {{item.uplink_neighbor}} soft-reconfiguration inbound
+ neighbor {{item.uplink_neighbor}} no shutdown
+!
+management route 0.0.0.0/0 10.10.0.1
+!
+logging facility syslog
+logging 10.10.11.3
+!
+snmp-server community public ro
+!
+snmp ifmib ifalias long
+!
+radius-server host 10.10.11.3 key 7 somepassword timeout 2
+!
+clock timezone EST -5
+clock summer-time EST recurring
+!
+ip ssh server enable
+!
+protocol lldp
+ advertise dot1-tlv port-protocol-vlan-id port-vlan-id
+ advertise management-tlv system-capabilities system-description system-name
+ no disable
+!
+line console 0
+line vty 0
+ login authentication radius
+ exec-timeout 60 0
+ authorization exec radius
+line vty 1
+ login authentication radius
+ exec-timeout 60 0
+ authorization exec radius
+line vty 2
+ login authentication radius
+ exec-timeout 60 0
+ authorization exec radius
+line vty 3
+ login authentication radius
+ exec-timeout 60 0
+ authorization exec radius
+line vty 4
+ login authentication radius
+ exec-timeout 60 0
+ authorization exec radius
+line vty 5
+ login authentication radius
+ exec-timeout 60 0
+ authorization exec radius
+line vty 6
+ login authentication radius
+ exec-timeout 60 0
+ authorization exec radius
+line vty 7
+ login authentication radius
+ exec-timeout 60 0
+ authorization exec radius
+line vty 8
+ login authentication radius
+ exec-timeout 60 0
+ authorization exec radius
+line vty 9
+ login authentication radius
+ exec-timeout 60 0
+ authorization exec radius
+!
+end
